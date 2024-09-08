@@ -1,0 +1,45 @@
+# .github/workflows/ci.yml
+
+name: Python Static Analysis and Testing
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.13.0-rc.1'
+
+    - name: Install dependencies
+      run: |
+        pip install autopep8 pylint flake8 pytest
+
+    - name: Autopep8 (Auto format code)
+      run: |
+        autopep8 --in-place --aggressive --aggressive hw2_debugging.py rand.py
+
+    - name: Run Pylint (Static analysis)
+      run: |
+        pylint hw2_debugging.py rand.py
+
+    - name: Run Flake8 (Style check)
+      run: |
+        flake8 hw2_debugging.py rand.py
+
+    - name: Run Tests with pytest
+      run: |
+        pytest
+
