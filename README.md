@@ -16,6 +16,6 @@ This repository contains the implementation of merge sort in `hw2_debugging.py` 
 ## Continuous Integration Badges
 
 - **Pylint**: ![Pylint](https://github.com/CSC510-SE/Homework2/actions/workflows/ci.yml/badge.svg?event=push)
-- **Flake8**: ![Flake8](https://github.com/CSC510-SE/Homework2/actions/workflows/ci.yml/badge.svg?event=push)
+- **Bandit**: ![Bandit](https://github.com/CSC510-SE/Homework2/actions/workflows/ci.yml/badge.svg?event=push)
 - **AutoPep8**: ![AutoPep8](https://github.com/CSC510-SE/Homework2/actions/workflows/ci.yml/badge.svg?event=push)
 
