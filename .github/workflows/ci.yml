@@ -25,7 +25,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install autopep8 pylint flake8 pytest
+        pip install autopep8 pylint bandit pytest
 
     - name: Autopep8 (Auto format code)
       run: |
@@ -37,7 +37,7 @@ jobs:
 
     - name: Run Flake8 (Style check)
       run: |
-        flake8 hw2_debugging.py rand.py
+        bandit hw2_debugging.py rand.py
 
     - name: Run Tests with pytest
       run: |
