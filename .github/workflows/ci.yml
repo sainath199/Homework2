@@ -35,7 +35,7 @@ jobs:
       run: |
         pylint hw2_debugging.py rand.py
 
-    - name: Run Flake8 (Style check)
+    - name: Run Bandit (Style check)
       run: |
         bandit hw2_debugging.py rand.py
 
