@@ -1,3 +1,7 @@
+"""
+This module contains a function `random_array` that fills an input list 
+with random numbers using the 'shuf' command via the subprocess module.
+"""
 import subprocess
 
 def random_array(arr):
