@@ -1,3 +1,5 @@
+# .github/workflows/ci.yml
+
 name: Python Static Analysis and Testing
 
 on:
@@ -13,90 +15,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Set up Python 3.x
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.x'
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.13.0-rc.1'
 
-      - name: Install dependencies
-        run: |
-          pip install autopep8 pylint bandit pytest
+    - name: Install dependencies
+      run: |
+        pip install autopep8 pylint pyright pytest
 
-      # AutoPEP8
-      - name: Run AutoPEP8 and set status
-        run: |
-          autopep8 --in-place --aggressive --aggressive hw2_debugging.py rand.py
-          echo "AUTOPEP_STATUS=$?" >> $GITHUB_ENV
-      
-      # Pylint
-      - name: Run Pylint and set score
-        run: |
-          PYLINT_SCORE=$(pylint hw2_debugging.py rand.py --score=n | tail -n 1 | grep -o -E '[0-9]+\.[0-9]+')
-          echo "PYLINT_SCORE=$PYLINT_SCORE" >> $GITHUB_ENV
+    - name: Autopep8 (Auto format code)
+      run: |
+        autopep8 --in-place --aggressive --aggressive hw2_debugging.py rand.py
 
-      # Bandit
-      - name: Run Bandit and set status
-        run: |
-          bandit hw2_debugging.py rand.py
-          echo "BANDIT_STATUS=$?" >> $GITHUB_ENV
+    - name: Run Pylint (Static analysis)
+      run: |
+        pylint hw2_debugging.py rand.py
+        exit_code=$?
+        if [ $exit_code -eq 0 ]; then
+          echo "PYLINT_STATUS=Pass" >> $GITHUB_ENV
+        else
+          echo "PYLINT_STATUS=Fail" >> $GITHUB_ENV
+        fi
+        
+    - name: Create Pylint Badge
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ secrets.GIST_SECRET }}
+        gistID: eda49634ad4b5d5f829e8ade4d6f138c
+        filename: pylint.json
+        label: Pylint
+        message: ${{ env.PYLINT_STATUS }}
+        color: ${{ env.PYLINT_STATUS == 'Pass' && 'green' || 'red' }}
 
-      # Pytest
-      - name: Run Pytest and set status
-        run: |
-          pytest
-          echo "PYTEST_STATUS=$?" >> $GITHUB_ENV
+    - name: Run pyright (Style check)
+      run: |
+        pyright hw2_debugging.py rand.py
 
-      # Create Pylint Badge
-      - name: Create Pylint Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
-          filename: pylint.json
-          label: Pylint Score
-          message: ${{ env.PYLINT_SCORE }}
-          valColorRange: ${{ env.PYLINT_SCORE }}
-          maxColorRange: 10
-          minColorRange: 0
-
-      # Create AutoPEP8 Badge
-      - name: Create AutoPEP8 Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
-          filename: autopep8.json
-          label: AutoPEP8 Format
-          message: ${{ env.AUTOPEP_STATUS }}
-          valColorRange: ${{ env.AUTOPEP_STATUS }}
-          maxColorRange: 0
-          minColorRange: 1
-
-      # Create Bandit Badge
-      - name: Create Bandit Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
-          filename: bandit.json
-          label: Bandit Security
-          message: ${{ env.BANDIT_STATUS }}
-          valColorRange: ${{ env.BANDIT_STATUS }}
-          maxColorRange: 0
-          minColorRange: 1
-
-      # Create Pytest Badge
-      - name: Create Pytest Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET }}
-          gistID: <gist-ID>
-          filename: pytest.json
-          label: Pytest Results
-          message: ${{ env.PYTEST_STATUS }}
-          valColorRange: ${{ env.PYTEST_STATUS }}
-          maxColorRange: 0
-          minColorRange: 1
+    - name: Run Tests with pytest
+      run: |
+        pytest
